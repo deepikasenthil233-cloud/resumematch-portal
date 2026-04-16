@@ -1,0 +1,145 @@
+type http_request_result = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type http_header = 
+ record {
+   name: text;
+   value: text;
+ };
+type _ImmutableObjectStorageRefillResult = 
+ record {
+   success: opt bool;
+   topped_up_amount: opt nat;
+ };
+type _ImmutableObjectStorageRefillInformation = record {
+                                                  proposed_top_up_amount:
+                                                   opt nat;};
+type _ImmutableObjectStorageCreateCertificateResult = 
+ record {
+   blob_hash: text;
+   method: text;
+ };
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type UserId = principal;
+type TransformationOutput = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type TransformationInput = 
+ record {
+   context: blob;
+   response: http_request_result;
+ };
+type Timestamp = int;
+type ResumeId = nat;
+type Resume = 
+ record {
+   "blob": ExternalBlob;
+   candidateId: UserId;
+   filename: text;
+   id: ResumeId;
+   uploadedAt: Timestamp;
+ };
+type RequirementScore = 
+ record {
+   feedback: text;
+   requirement: text;
+   score: nat;
+ };
+type MatchResult = 
+ record {
+   breakdown: vec RequirementScore;
+   candidateId: UserId;
+   id: MatchId;
+   jobId: JobId;
+   matchedAt: Timestamp;
+   overallScore: nat;
+   resumeId: ResumeId;
+ };
+type MatchId = nat;
+type JobStatus = 
+ variant {
+   closed;
+   open;
+ };
+type JobRequirements = 
+ record {
+   educationLevel: EducationLevel;
+   experienceLevel: ExperienceLevel;
+   minYearsExperience: nat;
+   otherRequirements: vec text;
+   skills: vec text;
+ };
+type JobId = nat;
+type Job = 
+ record {
+   createdAt: Timestamp;
+   createdBy: UserId;
+   description: text;
+   id: JobId;
+   requirements: JobRequirements;
+   status: JobStatus;
+   title: text;
+ };
+type ExternalBlob = blob;
+type ExperienceLevel = 
+ variant {
+   entry;
+   lead;
+   mid;
+   senior;
+ };
+type EducationLevel = 
+ variant {
+   bachelors;
+   highSchool;
+   masters;
+   notRequired;
+   phd;
+ };
+type CandidateProfile = 
+ record {
+   createdAt: Timestamp;
+   email: text;
+   id: UserId;
+   name: text;
+ };
+service : {
+  _immutableObjectStorageBlobsAreLive: (hashes: vec blob) -> (vec bool) query;
+  _immutableObjectStorageBlobsToDelete: () -> (vec blob) query;
+  _immutableObjectStorageConfirmBlobDeletion: (blobs: vec blob) -> ();
+  _immutableObjectStorageCreateCertificate: (blobHash: text) ->
+   (_ImmutableObjectStorageCreateCertificateResult);
+  _immutableObjectStorageRefillCashier: (refillInformation:
+   opt _ImmutableObjectStorageRefillInformation) ->
+   (_ImmutableObjectStorageRefillResult);
+  _immutableObjectStorageUpdateGatewayPrincipals: () -> ();
+  _initializeAccessControl: () -> ();
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  closeJob: (jobId: JobId) -> ();
+  createJob: (title: text, description: text, requirements:
+   JobRequirements) -> (JobId);
+  getCallerUserRole: () -> (UserRole) query;
+  getCandidateProfile: () -> (opt CandidateProfile) query;
+  getJob: (jobId: JobId) -> (opt Job) query;
+  getMyMatchForJob: (jobId: JobId) -> (opt MatchResult) query;
+  getMyMatches: () -> (vec MatchResult) query;
+  getMyResume: () -> (opt Resume) query;
+  isCallerAdmin: () -> (bool) query;
+  listAllJobs: () -> (vec Job) query;
+  listCandidateProfiles: () -> (vec CandidateProfile) query;
+  listOpenJobs: () -> (vec Job) query;
+  saveCandidateProfile: (name: text, email: text) -> ();
+  transform: (input: TransformationInput) -> (TransformationOutput) query;
+  uploadResume: (filename: text, "blob": ExternalBlob) -> ();
+}

@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-display: "Space Grotesk", sans-serif;
+    --font-body: "Plus Jakarta Sans", sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+    --radius: 0.5rem;
+
+    --background: 0.98 0.01 260;
+    --foreground: 0.18 0.02 260;
+    --card: 1.0 0 0;
+    --card-foreground: 0.18 0.02 260;
+    --popover: 1.0 0 0;
+    --popover-foreground: 0.18 0.02 260;
+
+    --primary: 0.55 0.14 240;
+    --primary-foreground: 0.98 0 0;
+
+    --secondary: 0.92 0.04 230;
+    --secondary-foreground: 0.28 0.02 240;
+    --muted: 0.93 0.02 260;
+    --muted-foreground: 0.48 0.02 260;
+
+    --accent: 0.63 0.15 146;
+    --accent-foreground: 0.98 0 0;
+
+    --destructive: 0.55 0.22 25;
+    --destructive-foreground: 0.98 0 0;
+
+    --border: 0.92 0.02 260;
+    --input: 0.96 0.01 260;
+    --ring: 0.55 0.14 240;
+
+    --chart-1: 0.63 0.15 146;
+    --chart-2: 0.55 0.14 240;
+    --chart-3: 0.65 0.12 50;
+    --chart-4: 0.52 0.16 30;
+    --chart-5: 0.72 0.14 260;
+
+    --sidebar: 0.96 0.01 260;
+    --sidebar-foreground: 0.18 0.02 260;
+    --sidebar-primary: 0.55 0.14 240;
+    --sidebar-primary-foreground: 0.98 0 0;
+    --sidebar-accent: 0.63 0.15 146;
+    --sidebar-accent-foreground: 0.98 0 0;
+    --sidebar-border: 0.92 0.02 260;
+    --sidebar-ring: 0.55 0.14 240;
+  }
+
+  .dark {
+    --background: 0.13 0.01 260;
+    --foreground: 0.92 0.02 260;
+    --card: 0.17 0.01 260;
+    --card-foreground: 0.92 0.02 260;
+    --popover: 0.21 0.01 260;
+    --popover-foreground: 0.92 0.02 260;
+
+    --primary: 0.72 0.15 250;
+    --primary-foreground: 0.13 0.01 260;
+
+    --secondary: 0.25 0.08 240;
+    --secondary-foreground: 0.85 0.02 260;
+    --muted: 0.25 0.08 240;
+    --muted-foreground: 0.56 0.02 260;
+
+    --accent: 0.75 0.18 140;
+    --accent-foreground: 0.13 0.01 260;
+
+    --destructive: 0.65 0.19 22;
+    --destructive-foreground: 0.13 0.01 260;
+
+    --border: 0.24 0.02 260;
+    --input: 0.24 0.02 260;
+    --ring: 0.72 0.15 250;
+
+    --chart-1: 0.75 0.18 140;
+    --chart-2: 0.72 0.15 250;
+    --chart-3: 0.78 0.16 50;
+    --chart-4: 0.68 0.18 30;
+    --chart-5: 0.82 0.16 260;
+
+    --sidebar: 0.17 0.01 260;
+    --sidebar-foreground: 0.92 0.02 260;
+    --sidebar-primary: 0.72 0.15 250;
+    --sidebar-primary-foreground: 0.13 0.01 260;
+    --sidebar-accent: 0.75 0.18 140;
+    --sidebar-accent-foreground: 0.13 0.01 260;
+    --sidebar-border: 0.24 0.02 260;
+    --sidebar-ring: 0.72 0.15 250;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/assets/fonts/SpaceGrotesk.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/assets/fonts/PlusJakartaSans.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/assets/fonts/JetBrainsMono.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@layer utilities {
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Match score badge utility */
+  .score-badge {
+    @apply inline-flex items-center justify-center rounded-full font-display font-bold text-accent-foreground bg-accent h-12 w-12 text-lg;
+  }
+
+  /* Match card accent bar */
+  .match-accent {
+    @apply absolute top-0 left-0 h-1 bg-accent;
+  }
+
+  /* Elevated card shadow for recruiting UI */
+  .card-elevated {
+    @apply shadow-md border border-border;
+  }
+
+  /* Admin form input consistent styling */
+  .form-input {
+    @apply bg-input border border-border rounded-md px-3 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring;
+  }
+}

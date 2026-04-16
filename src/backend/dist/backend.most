@@ -1,0 +1,105 @@
+// Version: 1.0.0
+type CandidateProfile__542767322 =
+  {
+    createdAt : Timestamp__301639476;
+    email : Text;
+    id : UserId__158757552;
+    name : Text
+  };
+type Data__791452850<K, V> =
+  {var count : Nat__490723111; kvs : [var ?(K, V)]};
+type EducationLevel__595131956 =
+  {#bachelors; #highSchool; #masters; #notRequired; #phd};
+type ExperienceLevel__12385620 = {#entry; #lead; #mid; #senior};
+type ExternalBlob__246066408 = Blob;
+type Int__270357528 = Int__616954475;
+type Int__616954475 = Int;
+type Internal__8484328<K, V> =
+  {children : [var ?Node__46230540<K, V>]; data : Data__791452850<K, V>};
+type JobId__339598917 = Nat;
+type JobRequirements__264141510 =
+  {
+    educationLevel : EducationLevel__595131956;
+    experienceLevel : ExperienceLevel__12385620;
+    minYearsExperience : Nat;
+    otherRequirements : [Text];
+    skills : [Text]
+  };
+type JobStatus__374926235 = {#closed; #open};
+type Job__848768964 =
+  {
+    createdAt : Timestamp__301639476;
+    createdBy : UserId__158757552;
+    description : Text;
+    id : JobId__339598917;
+    requirements : JobRequirements__264141510;
+    status : JobStatus__374926235;
+    title : Text
+  };
+type Leaf__809889148<K, V> = {data : Data__791452850<K, V>};
+type Map__158565046<K, V> = Map__297112838<K, V>;
+type Map__297112838<K, V> =
+  {var root : Node__46230540<K, V>; var size : Nat__490723111};
+type Map__605269027<K, V> = Map__158565046<K, V>;
+type MatchId__543136929 = Nat;
+type MatchResult__999750510 =
+  {
+    breakdown : [RequirementScore__1071935016];
+    candidateId : UserId__158757552;
+    id : MatchId__543136929;
+    jobId : JobId__339598917;
+    matchedAt : Timestamp__301639476;
+    overallScore : Nat;
+    resumeId : ResumeId__450474765
+  };
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Node__46230540<K, V> =
+  {#internal : Internal__8484328<K, V>; #leaf : Leaf__809889148<K, V>};
+type RequirementScore__1071935016 =
+  {feedback : Text; requirement : Text; score : Nat};
+type ResumeId__450474765 = Nat;
+type Resume__845583829 =
+  {
+    blob : ExternalBlob__246066408;
+    candidateId : UserId__158757552;
+    filename : Text;
+    id : ResumeId__450474765;
+    uploadedAt : Timestamp__301639476
+  };
+type Time__796480547 = Int__270357528;
+type Time__900049286 = Time__796480547;
+type Timestamp__301639476 = Time__900049286;
+type UserId__158757552 = Principal;
+type UserRole__1054455867 = {#admin; #guest; #user};
+actor {
+  stable accessControlState :
+    {
+      var adminAssigned : Bool;
+      userRoles : Map__605269027<Principal, UserRole__1054455867>
+    };
+  stable candidateProfiles :
+    {
+      var root :
+        Node__46230540<UserId__158757552, CandidateProfile__542767322>;
+      var size : Nat__490723111
+    };
+  stable jobs :
+    {
+      var root : Node__46230540<JobId__339598917, Job__848768964>;
+      var size : Nat__490723111
+    };
+  stable matches :
+    {
+      var root : Node__46230540<MatchId__543136929, MatchResult__999750510>;
+      var size : Nat__490723111
+    };
+  stable nextJobId : {var count : Nat};
+  stable nextMatchId : {var count : Nat};
+  stable nextResumeId : {var count : Nat};
+  stable resumes :
+    {
+      var root : Node__46230540<UserId__158757552, Resume__845583829>;
+      var size : Nat__490723111
+    }
+};

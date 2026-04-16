@@ -1,0 +1,21 @@
+{
+  "overview": "A job portal platform where candidates upload resumes and get automatically matched against open job postings using AI. Candidates see a transparent dashboard of their match scores with a side-by-side breakdown per job. Admins create job postings with defined requirements.",
+  "features": [
+    "Candidate account creation with name and email",
+    "Resume upload with automatic AI-powered matching",
+    "Candidate match dashboard showing scores per job (e.g. 85%, 72%, 65%)",
+    "Side-by-side breakdown comparing candidate profile vs job requirements",
+    "Admin panel for creating job postings with constraints",
+    "Transparent fairness — candidates always see their match results"
+  ],
+  "category": "job-portal-hr-tech",
+  "tags": [
+    "job-portal",
+    "ai-matching",
+    "resume",
+    "hiring",
+    "hr-tech",
+    "recruitment"
+  ],
+  "last_updated": "2026-04-15T17:51:29.558Z"
+}
