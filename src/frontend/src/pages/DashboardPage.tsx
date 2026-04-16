@@ -538,6 +538,24 @@ export default function DashboardPage() {
               </p>
             </div>
 
+            {/* Zero-score hint — when all matches are 0% */}
+            {sortedMatches.every((m) => Number(m.overallScore) === 0) && (
+              <div
+                className="mb-4 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/8 px-4 py-3"
+                data-ocid="dashboard.zero_score_hint"
+              >
+                <Clock className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-sm text-amber-700 dark:text-amber-400">
+                  <span className="font-semibold">
+                    Match scores may be pending
+                  </span>{" "}
+                  — the AI analysis usually completes within a minute. If scores
+                  remain at 0%, ask your admin to verify the AI key is
+                  configured in the admin panel, then re-upload your resume.
+                </p>
+              </div>
+            )}
+
             <div className="space-y-3" data-ocid="dashboard.matches_list">
               {sortedMatches.map((match: MatchResult, idx: number) => {
                 const cardId = match.id.toString();

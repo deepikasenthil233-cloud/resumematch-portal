@@ -1,5 +1,5 @@
 import Map "mo:core/Map";
-import Principal "mo:core/Principal";
+import _Principal "mo:core/Principal";
 import AccessControl "mo:caffeineai-authorization/access-control";
 import MixinAuthorization "mo:caffeineai-authorization/MixinAuthorization";
 import MixinObjectStorage "mo:caffeineai-object-storage/Mixin";

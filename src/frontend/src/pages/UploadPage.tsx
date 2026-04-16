@@ -166,20 +166,17 @@ export default function UploadPage() {
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[oklch(0.63_0.18_146)]/15">
             <CheckCircle2 className="h-9 w-9 text-[oklch(0.48_0.18_146)]" />
           </div>
-          <div className="space-y-1">
+          <div className="space-y-2">
             <h2 className="font-display text-xl font-bold text-[oklch(0.35_0.12_146)]">
-              Resume uploaded!
+              Resume uploaded successfully!
             </h2>
-            <p className="text-[oklch(0.48_0.18_146)] font-medium">
-              Matching in progress...
+            <p className="text-[oklch(0.48_0.18_146)] font-medium text-base">
+              Your resume has been uploaded.
             </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              You'll be redirected to your dashboard in a moment.
+            <p className="text-sm text-muted-foreground max-w-sm">
+              Matching results will appear on your dashboard shortly. You'll be
+              redirected there now.
             </p>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Spinner size="sm" />
-            <span>Analysing your resume against open jobs</span>
           </div>
         </div>
       ) : (

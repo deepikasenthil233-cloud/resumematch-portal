@@ -1,8 +1,13 @@
 import {
   AlertCircle,
+  AlertTriangle,
   Briefcase,
   CheckCircle2,
+  Eye,
+  EyeOff,
+  KeyRound,
   PlusCircle,
+  Settings,
   Tag,
   X,
 } from "lucide-react";
@@ -21,7 +26,12 @@ import {
 } from "../components/ui/select";
 import { Skeleton } from "../components/ui/skeleton";
 import { Textarea } from "../components/ui/textarea";
-import { useCloseJob, useCreateJob, useListAllJobs } from "../hooks/useBackend";
+import {
+  useCloseJob,
+  useCreateJob,
+  useListAllJobs,
+  useSetOpenAiApiKey,
+} from "../hooks/useBackend";
 import type { CreateJobParams } from "../hooks/useBackend";
 import { EducationLevel, ExperienceLevel, JobStatus } from "../types";
 import type { Job } from "../types";
@@ -53,6 +63,212 @@ const DEFAULT_FORM = {
   experienceLevel: ExperienceLevel.entry,
   otherRequirements: "",
 };
+
+// ─── AI Configuration Panel ───────────────────────────────────────────────────
+
+function ApiKeyPanel() {
+  const [apiKey, setApiKey] = useState("");
+  const [showKey, setShowKey] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const setOpenAiApiKey = useSetOpenAiApiKey();
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!apiKey.trim()) return;
+    try {
+      await setOpenAiApiKey.mutateAsync(apiKey.trim());
+      setSaved(true);
+      setApiKey("");
+      toast.success("OpenAI API key saved. Resume matching is now active.");
+    } catch {
+      toast.error("Failed to save API key. Please try again.");
+    }
+  }
+
+  return (
+    <section
+      aria-labelledby="ai-config-heading"
+      data-ocid="admin.api_key_panel"
+      className="mb-10"
+    >
+      {/* Section label */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="bg-primary/10 rounded-lg p-1.5">
+          <Settings className="h-4 w-4 text-primary" />
+        </div>
+        <h2
+          id="ai-config-heading"
+          className="font-display font-bold text-lg text-foreground"
+        >
+          AI Configuration
+        </h2>
+        <Badge
+          variant="outline"
+          className="ml-1 text-xs font-semibold"
+          style={{
+            background: "oklch(0.95 0.08 85 / 0.3)",
+            borderColor: "oklch(0.75 0.12 85 / 0.6)",
+            color: "oklch(0.45 0.12 85)",
+          }}
+        >
+          Required
+        </Badge>
+      </div>
+
+      {/* Main card — amber border to signal required action */}
+      <div
+        className="rounded-2xl overflow-hidden shadow-sm"
+        style={{
+          border: "2px solid oklch(0.75 0.12 85 / 0.7)",
+          background: "var(--card)",
+        }}
+      >
+        {/* Warning banner — full-width amber */}
+        {!saved && (
+          <div
+            className="flex items-start gap-3 px-5 py-4 border-b"
+            style={{
+              background: "oklch(0.95 0.08 85 / 0.25)",
+              borderBottomColor: "oklch(0.75 0.12 85 / 0.4)",
+            }}
+          >
+            <AlertTriangle
+              className="h-5 w-5 shrink-0 mt-0.5"
+              style={{ color: "oklch(0.6 0.14 85)" }}
+            />
+            <div className="min-w-0">
+              <p
+                className="text-sm font-bold"
+                style={{ color: "oklch(0.45 0.14 85)" }}
+              >
+                No API key set — resume matching will show 0% until you enter a
+                key
+              </p>
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: "oklch(0.5 0.1 85)" }}
+              >
+                Enter your OpenAI API key below and click{" "}
+                <strong>Save API Key</strong> to enable AI-powered resume
+                analysis.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Success banner */}
+        {saved && (
+          <div
+            className="flex items-center gap-3 px-5 py-4 border-b"
+            style={{
+              background: "oklch(0.95 0.07 150 / 0.2)",
+              borderBottomColor: "oklch(0.7 0.12 150 / 0.4)",
+            }}
+            data-ocid="admin.api_key_success_state"
+          >
+            <CheckCircle2
+              className="h-5 w-5 shrink-0"
+              style={{ color: "oklch(0.55 0.14 150)" }}
+            />
+            <p
+              className="text-sm font-semibold"
+              style={{ color: "oklch(0.45 0.12 150)" }}
+            >
+              API key saved — resume matching is now enabled. New uploads will
+              be analyzed by AI.
+            </p>
+          </div>
+        )}
+
+        {/* Form body */}
+        <div className="px-6 py-5">
+          <div className="mb-4">
+            <p className="text-sm text-muted-foreground">
+              Your OpenAI API key is required to analyze uploaded resumes and
+              calculate match scores. The key is stored securely and never
+              exposed to candidates.
+            </p>
+          </div>
+
+          <form onSubmit={handleSave} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="openai-key"
+                className="text-sm font-semibold text-foreground"
+              >
+                OpenAI API Key
+              </Label>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Input
+                    id="openai-key"
+                    type={showKey ? "text" : "password"}
+                    placeholder="sk-proj-..."
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className="pr-10 font-mono text-sm h-11"
+                    aria-label="OpenAI API Key"
+                    data-ocid="admin.api_key_input"
+                    autoComplete="off"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowKey((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={showKey ? "Hide key" : "Show key"}
+                    tabIndex={-1}
+                  >
+                    {showKey ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+                <Button
+                  type="submit"
+                  disabled={!apiKey.trim() || setOpenAiApiKey.isPending}
+                  className="shrink-0 font-display font-bold h-11 px-6 text-sm"
+                  data-ocid="admin.save_api_key_button"
+                  style={{
+                    background: apiKey.trim()
+                      ? "oklch(0.6 0.14 85)"
+                      : undefined,
+                    color: apiKey.trim() ? "oklch(0.1 0.02 85)" : undefined,
+                  }}
+                >
+                  {setOpenAiApiKey.isPending ? (
+                    <span className="flex items-center gap-2">
+                      <span className="h-4 w-4 border-2 border-current/40 border-t-current rounded-full animate-spin" />
+                      Saving…
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <KeyRound className="h-4 w-4" />
+                      Save API Key
+                    </span>
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Get your API key from{" "}
+                <a
+                  href="https://platform.openai.com/api-keys"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 hover:text-foreground transition-colors font-medium"
+                >
+                  platform.openai.com/api-keys
+                </a>
+                . You only need to set this once.
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 // ─── Skill Tag Input ──────────────────────────────────────────────────────────
 
@@ -300,21 +516,34 @@ export default function AdminPage() {
       <div className="bg-card border-b border-border px-6 py-5 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center gap-3">
           <div className="bg-primary/10 rounded-lg p-2 shrink-0">
-            <Briefcase className="h-5 w-5 text-primary" />
+            <Settings className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="font-display font-bold text-xl text-foreground">
-              Job Management
+              Admin Panel
             </h1>
             <p className="text-muted-foreground text-sm mt-0.5">
-              Create and manage job postings for your organization
+              AI Configuration &amp; Job Management
             </p>
           </div>
         </div>
       </div>
 
-      {/* Two-panel layout */}
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* ── STEP 1: AI Configuration (always at top, always visible) ──── */}
+        <ApiKeyPanel />
+
+        {/* ── Divider ─────────────────────────────────────────────────── */}
+        <div className="flex items-center gap-3 mb-8">
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+            <Briefcase className="h-3.5 w-3.5" />
+            Job Management
+          </span>
+          <div className="flex-1 h-px bg-border" />
+        </div>
+
+        {/* ── STEP 2: Job management two-panel layout ─────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 items-start">
           {/* ── Left: Create Job Form ───────────────────────────────────── */}
           <div

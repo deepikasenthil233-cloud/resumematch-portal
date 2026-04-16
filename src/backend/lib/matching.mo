@@ -84,7 +84,7 @@ module {
     resumeId : Common.ResumeId,
     matchId : Common.MatchId,
   ) : MatchTypes.MatchResult {
-    let overallScore = extractNatField(rawJson, "\"overallScore\"");
+    let overallScore = extractNatField(rawJson, "overallScore");
     let breakdown = parseBreakdown(rawJson);
 
     {
@@ -100,10 +100,16 @@ module {
 
   // -- Private helpers --
 
-  // Extract the value of a numeric JSON field (fieldName: <number>).
+  // Extract the value of a numeric JSON field by name.
+  // Handles both `"fieldName":85` and `"fieldName": 85` (space after colon).
   func extractNatField(json : Text, fieldName : Text) : Nat {
-    let needle = fieldName # ":";
+    // Build both possible needle variants
+    let needleSpace = "\"" # fieldName # "\": ";
+    let needleNoSpace = "\"" # fieldName # "\":";
+    // Prefer the spaced variant (more common in pretty-printed OpenAI output)
+    let needle = if (json.contains(#text needleSpace)) needleSpace else needleNoSpace;
     if (not json.contains(#text needle)) return 0;
+
     let parts = json.split(#text needle);
     var afterField : Text = "";
     var isFirst = true;
@@ -113,11 +119,13 @@ module {
       };
     };
     if (afterField == "") return 0;
-    // Trim leading whitespace then collect leading digit characters only.
+
+    // Trim any leading whitespace then collect leading digit characters only.
     let trimmed = afterField.trimStart(#predicate(func(c : Char) : Bool {
       c == ' ' or c == '\n' or c == '\r' or c == '\t'
     }));
-    // foldLeft to collect digits until we hit a non-digit, using a (done, acc) state tuple
+
+    // foldLeft to collect digits until we hit a non-digit, using (done, acc) state
     let (_, numText) = trimmed.foldLeft(
       (false, ""),
       func(state, c) {
@@ -134,14 +142,17 @@ module {
     };
   };
 
-  // Extract the string value of a JSON field. Handles both
-  // `"field":"value"` and `"field": "value"` (space after colon).
+  // Extract a string value from a JSON segment by field name.
+  // Handles `"field":"value"`, `"field": "value"`, and variants with a
+  // leading space before the field name (`" "field":`) to be tolerant of
+  // pretty-printed output from OpenAI.
   func extractTextField(segment : Text, fieldName : Text) : Text {
-    // Try with space after colon first (common in OpenAI responses), then without
-    let needleSpace = fieldName # "\": \"";
-    let needleNoSpace = fieldName # "\":\"";
+    // Build all spacing variants: with/without space after colon
+    let needleSpace = "\"" # fieldName # "\": \"";
+    let needleNoSpace = "\"" # fieldName # "\":\"";
     let needle = if (segment.contains(#text needleSpace)) needleSpace else needleNoSpace;
     if (not segment.contains(#text needle)) return "";
+
     let parts = segment.split(#text needle);
     var afterField : Text = "";
     var isFirst = true;
@@ -151,7 +162,9 @@ module {
       };
     };
     if (afterField == "") return "";
-    // Collect chars until closing unescaped quote, using (done, escaped, acc) state
+
+    // Collect chars until closing unescaped quote, tracking backslash escapes.
+    // State: (done, escaped, accumulated)
     let (_, _, result) = afterField.foldLeft(
       (false, false, ""),
       func(state, c) {
@@ -167,18 +180,27 @@ module {
   };
 
   // Parse the breakdown array from the JSON response.
-  // Handles both `{"requirement"` and `{ "requirement"` (with space after brace).
+  // Splits on the `{"requirement"` object boundary — tolerates any amount of
+  // whitespace between `{` and `"requirement"` (e.g. `{ "requirement"`,
+  // `{  "requirement"`, etc.) by normalising the text first.
   func parseBreakdown(json : Text) : [MatchTypes.RequirementScore] {
-    let marker = if (json.contains(#text "{ \"requirement\"")) "{ \"requirement\"" else "{\"requirement\"";
-    let items = json.split(#text marker);
+    // Normalise: collapse `{ "` and `{  "` variants to `{"` so we always
+    // split on a single consistent marker.
+    let normalised = json
+      .replace(#text "{ \"", "{\"")
+      .replace(#text "{  \"", "{\"")
+      .replace(#text "{   \"", "{\"");
+
+    let marker = "{\"requirement\"";
+    let items = normalised.split(#text marker);
     var results : [MatchTypes.RequirementScore] = [];
     var isFirst = true;
     for (item in items) {
       if (isFirst) { isFirst := false } else {
         let seg = marker # item;
-        let req = extractTextField(seg, "\"requirement");
-        let score = extractNatField(seg, "\"score\"");
-        let feedback = extractTextField(seg, "\"feedback");
+        let req = extractTextField(seg, "requirement");
+        let score = extractNatField(seg, "score");
+        let feedback = extractTextField(seg, "feedback");
         if (req != "") {
           results := results.concat([{ requirement = req; score; feedback }]);
         };

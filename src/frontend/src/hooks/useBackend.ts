@@ -206,6 +206,17 @@ export function useGetMyMatchForJob(jobId: JobId | null) {
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 
+export function useSetOpenAiApiKey() {
+  const { actor } = useActor(createActor);
+
+  return useMutation({
+    mutationFn: async (apiKey: string) => {
+      if (!actor) throw new Error("Actor not available");
+      return actor.setOpenAiApiKey(apiKey);
+    },
+  });
+}
+
 export function useListCandidateProfiles() {
   const { actor, isFetching: actorFetching } = useActor(createActor);
 
