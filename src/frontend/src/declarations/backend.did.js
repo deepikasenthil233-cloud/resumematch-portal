@@ -155,6 +155,7 @@ export const idlService = IDL.Service({
     ),
   'listOpenJobs' : IDL.Func([], [IDL.Vec(Job)], ['query']),
   'saveCandidateProfile' : IDL.Func([IDL.Text, IDL.Text], [], []),
+  'setOpenAiApiKey' : IDL.Func([IDL.Text], [], []),
   'transform' : IDL.Func(
       [TransformationInput],
       [TransformationOutput],
@@ -311,6 +312,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'listOpenJobs' : IDL.Func([], [IDL.Vec(Job)], ['query']),
     'saveCandidateProfile' : IDL.Func([IDL.Text, IDL.Text], [], []),
+    'setOpenAiApiKey' : IDL.Func([IDL.Text], [], []),
     'transform' : IDL.Func(
         [TransformationInput],
         [TransformationOutput],

@@ -210,6 +210,7 @@ export interface backendInterface {
     listCandidateProfiles(): Promise<Array<CandidateProfile>>;
     listOpenJobs(): Promise<Array<Job>>;
     saveCandidateProfile(name: string, email: string): Promise<void>;
+    setOpenAiApiKey(key: string): Promise<void>;
     transform(input: TransformationInput): Promise<TransformationOutput>;
     uploadResume(filename: string, blob: ExternalBlob): Promise<void>;
 }
@@ -507,6 +508,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.saveCandidateProfile(arg0, arg1);
+            return result;
+        }
+    }
+    async setOpenAiApiKey(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.setOpenAiApiKey(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.setOpenAiApiKey(arg0);
             return result;
         }
     }

@@ -133,6 +133,7 @@ export interface _SERVICE {
   'listCandidateProfiles' : ActorMethod<[], Array<CandidateProfile>>,
   'listOpenJobs' : ActorMethod<[], Array<Job>>,
   'saveCandidateProfile' : ActorMethod<[string, string], undefined>,
+  'setOpenAiApiKey' : ActorMethod<[string], undefined>,
   'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
   'uploadResume' : ActorMethod<[string, ExternalBlob], undefined>,
 }

@@ -97,6 +97,7 @@ actor {
   stable nextJobId : {var count : Nat};
   stable nextMatchId : {var count : Nat};
   stable nextResumeId : {var count : Nat};
+  stable openAiApiKey : {var value : Text};
   stable resumes :
     {
       var root : Node__46230540<UserId__158757552, Resume__845583829>;

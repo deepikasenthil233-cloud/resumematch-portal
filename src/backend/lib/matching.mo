@@ -134,9 +134,13 @@ module {
     };
   };
 
-  // Extract the string value of a JSON field (fieldName": "<value>").
+  // Extract the string value of a JSON field. Handles both
+  // `"field":"value"` and `"field": "value"` (space after colon).
   func extractTextField(segment : Text, fieldName : Text) : Text {
-    let needle = fieldName # "\":\"";
+    // Try with space after colon first (common in OpenAI responses), then without
+    let needleSpace = fieldName # "\": \"";
+    let needleNoSpace = fieldName # "\":\"";
+    let needle = if (segment.contains(#text needleSpace)) needleSpace else needleNoSpace;
     if (not segment.contains(#text needle)) return "";
     let parts = segment.split(#text needle);
     var afterField : Text = "";
@@ -153,7 +157,7 @@ module {
       func(state, c) {
         let (done, esc, acc) = state;
         if (done) state
-        else if (esc) (false, false, acc # "\\" # Text.fromChar(c))
+        else if (esc) (false, false, acc # Text.fromChar(c))
         else if (c == '\\') (false, true, acc)
         else if (c == '\"') (true, false, acc)
         else (false, false, acc # Text.fromChar(c));
@@ -163,13 +167,15 @@ module {
   };
 
   // Parse the breakdown array from the JSON response.
+  // Handles both `{"requirement"` and `{ "requirement"` (with space after brace).
   func parseBreakdown(json : Text) : [MatchTypes.RequirementScore] {
-    let items = json.split(#text "{\"requirement\"");
+    let marker = if (json.contains(#text "{ \"requirement\"")) "{ \"requirement\"" else "{\"requirement\"";
+    let items = json.split(#text marker);
     var results : [MatchTypes.RequirementScore] = [];
     var isFirst = true;
     for (item in items) {
       if (isFirst) { isFirst := false } else {
-        let seg = "{\"requirement\"" # item;
+        let seg = marker # item;
         let req = extractTextField(seg, "\"requirement");
         let score = extractNatField(seg, "\"score\"");
         let feedback = extractTextField(seg, "\"feedback");

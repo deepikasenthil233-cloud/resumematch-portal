@@ -117,6 +117,7 @@ export interface backendInterface {
     listCandidateProfiles(): Promise<Array<CandidateProfile>>;
     listOpenJobs(): Promise<Array<Job>>;
     saveCandidateProfile(name: string, email: string): Promise<void>;
+    setOpenAiApiKey(key: string): Promise<void>;
     transform(input: TransformationInput): Promise<TransformationOutput>;
     uploadResume(filename: string, blob: ExternalBlob): Promise<void>;
 }

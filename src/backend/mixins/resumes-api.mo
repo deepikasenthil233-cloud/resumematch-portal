@@ -18,7 +18,16 @@ mixin (
   matches : Map.Map<Common.MatchId, MatchTypes.MatchResult>,
   nextResumeId : { var count : Nat },
   nextMatchId : { var count : Nat },
+  openAiApiKey : { var value : Text },
 ) {
+  /// Admin: set the OpenAI API key used for resume matching
+  public shared ({ caller }) func setOpenAiApiKey(key : Text) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: admin only");
+    };
+    openAiApiKey.value := key;
+  };
+
   /// Candidate: upload resume and auto-trigger matching against all open jobs
   public shared ({ caller }) func uploadResume(
     filename : Text,
@@ -42,7 +51,7 @@ mixin (
       let rawJson = try {
         await OutCall.httpPostRequest(
           "https://api.openai.com/v1/chat/completions",
-          [{ name = "Authorization"; value = "Bearer OPENAI_API_KEY" },
+          [{ name = "Authorization"; value = "Bearer " # openAiApiKey.value },
            { name = "Content-Type"; value = "application/json" }],
           requestBody,
           transform,
@@ -104,7 +113,7 @@ mixin (
       func(state, c) {
         let (done, esc, acc) = state;
         if (done) state
-        else if (esc) (false, false, acc # "\\" # Text.fromChar(c))
+        else if (esc) (false, false, acc # Text.fromChar(c))
         else if (c == '\\') (false, true, acc)
         else if (c == '\"') (true, false, acc)
         else (false, false, acc # Text.fromChar(c));

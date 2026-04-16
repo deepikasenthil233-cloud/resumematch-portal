@@ -32,9 +32,12 @@ actor {
   let nextResumeId = { var count : Nat = 0 };
   let nextMatchId = { var count : Nat = 0 };
 
+  // OpenAI API key (set by admin after deployment)
+  let openAiApiKey = { var value : Text = "" };
+
   // Domain API mixins
   include AccountsMixin(accessControlState, candidateProfiles);
   include JobsMixin(accessControlState, jobs, nextJobId);
-  include ResumesMixin(accessControlState, resumes, jobs, matches, nextResumeId, nextMatchId);
+  include ResumesMixin(accessControlState, resumes, jobs, matches, nextResumeId, nextMatchId, openAiApiKey);
   include MatchingMixin(accessControlState, matches);
 };

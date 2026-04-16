@@ -135,6 +135,7 @@ export const mockBackend: backendInterface = {
   listCandidateProfiles: async () => [sampleProfile],
   listOpenJobs: async () => sampleJobs,
   saveCandidateProfile: async () => undefined,
+  setOpenAiApiKey: async () => undefined,
   transform: async (input) => ({ status: BigInt(200), body: input.response.body, headers: [] }),
   uploadResume: async () => undefined,
 };

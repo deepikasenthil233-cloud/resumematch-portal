@@ -140,6 +140,7 @@ service : {
   listCandidateProfiles: () -> (vec CandidateProfile) query;
   listOpenJobs: () -> (vec Job) query;
   saveCandidateProfile: (name: text, email: text) -> ();
+  setOpenAiApiKey: (key: text) -> ();
   transform: (input: TransformationInput) -> (TransformationOutput) query;
   uploadResume: (filename: text, "blob": ExternalBlob) -> ();
 }
